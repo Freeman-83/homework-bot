@@ -63,13 +63,12 @@ def get_api_answer(timestamp: dict) -> dict:
     try:
         homeworks = requests.get(ENDPOINT, headers=HEADERS, params=timestamp)
         if homeworks.status_code != HTTPStatus.OK:
-            message = (f'Эндпоинт {ENDPOINT} недоступен. '
-                       f'Код ответа API: {homeworks.status_code}')
-            raise ConnectionError(message)
+            raise ConnectionError(f'Эндпоинт {ENDPOINT} недоступен. '
+                                  f'Код ответа API: {homeworks.status_code}')
         return homeworks.json()
 
     except requests.RequestException as error:
-        logger.error(error)
+        logger.error(f'Ошибка при запросе к эндпоинту: {error}')
 
 
 def check_response(response: dict) -> dict:
