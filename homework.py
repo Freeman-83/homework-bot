@@ -91,10 +91,12 @@ def check_response(response: dict) -> dict:
 def parse_status(homework: dict) -> str:
     """Получение информации об обновлении статуса проверки."""
     if homework:
-        if 'homework_name' not in homework or 'status' not in homework:
-            raise KeyError('Отсутствует название домашней работы')
+        if 'homework_name' not in homework:
+            raise KeyError('Отсутствует ключ "homework_name"')
+        if 'status' not in homework:
+            raise KeyError('Отсутствует ключ "status"')
         if not homework['status']:
-            raise KeyError('Статус проверки пуст')
+            raise ValueError('Статус проверки работы пуст')
         if homework['status'] not in HOMEWORK_VERDICTS:
             raise KeyError(
                 'Статус проверки не соответствует ожидаемым вариантам'
