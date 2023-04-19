@@ -10,15 +10,15 @@ from telegram.error import TelegramError
 
 load_dotenv()
 
-PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
-TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
-TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
+PRACTICUM_TOKEN: str = os.getenv('PRACTICUM_TOKEN')
+TELEGRAM_TOKEN: str = os.getenv('TELEGRAM_TOKEN')
+TELEGRAM_CHAT_ID: str = os.getenv('TELEGRAM_CHAT_ID')
 
-RETRY_PERIOD = 600
-ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
-HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
+RETRY_PERIOD: int = 600
+ENDPOINT: str = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
+HEADERS: dict = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
 
-HOMEWORK_VERDICTS = {
+HOMEWORK_VERDICTS: dict = {
     'approved': 'Работа проверена: ревьюеру всё понравилось. Ура!',
     'reviewing': 'Работа взята на проверку ревьюером.',
     'rejected': 'Работа проверена: у ревьюера есть замечания.'
@@ -34,7 +34,7 @@ formatter = logging.Formatter(
 handler.setFormatter(formatter)
 
 
-def check_tokens():
+def check_tokens() -> None:
     """Проверка доступности переменных окружения."""
     variables = {
         PRACTICUM_TOKEN: 'PRACTICUM_TOKEN',
@@ -49,7 +49,7 @@ def check_tokens():
             sys.exit()
 
 
-def send_message(bot, message: str):
+def send_message(bot: telegram.Bot, message: str) -> None:
     """Отправка сообщения в чат."""
     try:
         bot.send_message(TELEGRAM_CHAT_ID, message)
@@ -114,7 +114,7 @@ def parse_status(homework: dict) -> str:
     return message
 
 
-def main():
+def main() -> None:
     """Основная логика работы бота."""
     check_tokens()
 
