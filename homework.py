@@ -7,7 +7,6 @@ import time
 from dotenv import load_dotenv
 from http import HTTPStatus
 from telegram.error import TelegramError
-from exceptions import EmptyValueError
 
 load_dotenv()
 
@@ -95,7 +94,7 @@ def parse_status(homework: dict) -> str:
         if 'homework_name' not in homework or 'status' not in homework:
             raise KeyError('Отсутствует название домашней работы')
         if not homework['status']:
-            raise EmptyValueError('Статус проверки пуст')
+            raise KeyError('Статус проверки пуст')
         if homework['status'] not in HOMEWORK_VERDICTS:
             raise KeyError(
                 'Статус проверки не соответствует ожидаемым вариантам'
