@@ -36,7 +36,7 @@ handler.setFormatter(formatter)
 
 def check_tokens() -> None:
     """Проверка доступности переменных окружения."""
-    variables = {
+    variables: dict = {
         PRACTICUM_TOKEN: 'PRACTICUM_TOKEN',
         TELEGRAM_TOKEN: 'TELEGRAM_TOKEN',
         TELEGRAM_CHAT_ID: 'TELEGRAM_CHAT_ID'
