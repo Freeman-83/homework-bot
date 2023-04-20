@@ -34,24 +34,18 @@ formatter = logging.Formatter(
 handler.setFormatter(formatter)
 
 
-def check_tokens() -> None:
+def check_tokens() -> bool:
     """Проверка доступности переменных окружения."""
-    variables: dict = {
-        PRACTICUM_TOKEN: 'PRACTICUM_TOKEN',
-        TELEGRAM_TOKEN: 'TELEGRAM_TOKEN',
-        TELEGRAM_CHAT_ID: 'TELEGRAM_CHAT_ID'
-    }
-    for var, name in variables.items():
-        if not var:
-            logger.critical(
-                f'Отсутствует обязательная переменная окружения {name}'
-            )
-            sys.exit()
+    variables: list = [PRACTICUM_TOKEN,
+                       TELEGRAM_TOKEN,
+                       TELEGRAM_CHAT_ID]
+    return all(variables)
 
 
 def send_message(bot: telegram.Bot, message: str) -> None:
     """Отправка сообщения в чат."""
     try:
+        logger.info('Отправка сообщения в чат')
         bot.send_message(TELEGRAM_CHAT_ID, message)
         logger.debug('Сообщение отправлено')
     except TelegramError as error:
@@ -60,15 +54,16 @@ def send_message(bot: telegram.Bot, message: str) -> None:
 
 def get_api_answer(timestamp: dict) -> dict:
     """Отправка запроса к эндпоинту."""
+    homeworks = ''
     try:
         homeworks = requests.get(ENDPOINT, headers=HEADERS, params=timestamp)
-        if homeworks.status_code != HTTPStatus.OK:
-            raise ConnectionError(f'Эндпоинт {ENDPOINT} недоступен. '
-                                  f'Код ответа API: {homeworks.status_code}')
-        return homeworks.json()
-
     except requests.RequestException as error:
         logger.error(f'Ошибка при запросе к эндпоинту: {error}')
+
+    if homeworks.status_code != HTTPStatus.OK:
+        raise ConnectionError(f'Эндпоинт {ENDPOINT} недоступен. '
+                              f'Код ответа API: {homeworks.status_code}')
+    return homeworks.json()
 
 
 def check_response(response: dict) -> dict:
@@ -115,10 +110,15 @@ def parse_status(homework: dict) -> str:
 
 def main() -> None:
     """Основная логика работы бота."""
-    check_tokens()
+    if not check_tokens():
+        logger.critical('Отсутствует обязательные переменные окружения! '
+                        'Работа программы принудительно завершена')
+        sys.exit()
 
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
+    logger.info('Бот запущен!')
     timestamp = {'from_date': int(time.time())}
+    previous_message = ''
 
     while True:
         try:
@@ -129,14 +129,18 @@ def main() -> None:
 
             homework = check_response(response)
             message = parse_status(homework)
-            if not homework:
+            if message == previous_message:
                 continue
             send_message(bot, message)
+            previous_message = message
 
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
             logger.error(message)
+            if message == previous_message:
+                continue
             send_message(bot, message)
+            previous_message = message
 
         finally:
             time.sleep(RETRY_PERIOD)
