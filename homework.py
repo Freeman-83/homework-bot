@@ -54,7 +54,6 @@ def send_message(bot: telegram.Bot, message: str) -> None:
 
 def get_api_answer(timestamp: dict) -> dict:
     """Отправка запроса к эндпоинту."""
-    homeworks = ''
     try:
         homeworks = requests.get(ENDPOINT, headers=HEADERS, params=timestamp)
     except requests.RequestException as error:
