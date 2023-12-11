@@ -40,3 +40,5 @@ python homework.py
 ```
 pytest
 ```
+## Автор:
+Михаил Марин
